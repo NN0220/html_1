@@ -1,310 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokyo - A City of Contrasts</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: serif;
-        }
-
-        body {
-            background-color: #f8f8f9;
-            color: #222;
-            line-height: 1.6;
-            scroll-behavior: smooth; 
-        }
-
-        header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #eaeaea;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .page {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            font-size: 24px;
-            font-weight: bold;
-            text-decoration: none;
-            color: #000;
-            letter-spacing: 2px;
-        }
-
-        .nav {
-            display: flex;
-            gap: 30px;
-            list-style: none;
-        }
-
-        .nav li a {
-            text-decoration: none;
-            color: #555;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s;
-        }
-
-        .nav li a:hover {
-            color: #000;
-        }
-
-        .hero {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqxgbKqgnFEq85ZMoQJuudWzluhjHh2aPp2tykR_59LBtFHA0wFjXLuzsKYNo&s') no-repeat center center/cover;
-            height: 80vh;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 0 10%;
-        }
-
-        .hero h3 {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-            font-family: sans-serif;
-        }
-
-        .hero h1 {
-            font-size: 64px;
-            margin-bottom: 20px;
-            font-weight: 400;
-            letter-spacing: -1px;
-        }
-
-        .hero p {
-            font-size: 18px;
-            max-width: 500px;
-            font-family: sans-serif;
-            font-weight: 300;
-        }
-
-        .section {
-            max-width: 1100px;
-            margin: 90px auto;
-            padding: 0 20px;
-        }
-
-        .section-tag {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #888;
-            margin-bottom: 10px;
-            font-family: sans-serif;
-        }
-
-        .section h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-
-        .section p {
-            font-size: 16px;
-            color: #555;
-            font-family: sans-serif;
-            margin-bottom: 15px;
-        }
-
-        .content-row {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-            margin-top: 20px;
-        }
-
-        .content-row.reverse {
-            flex-direction: row-reverse; 
-        }
-
-        .content-text {
-            flex: 1;
-        }
-
-        .content-image {
-            flex: 1;
-        }
-
-        .content-image img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-radius: 6px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .image {
-            display: block;
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            width: 100%;
-            opacity: 0;
-            transition: .5s ease;
-            background-color: rgba(175, 95, 20, 0.7);
-        }
-
-        .container:hover .overlay {
-            opacity: 1;
-        }
-
-        .text {
-            color: white;
-            font-size: 20px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            font-family: sans-serif;
-            padding: 0 20px;
-        }
-
-        .text span {
-            display: block;
-            font-size: 14px;
-            color: #ccc;
-            margin-top: 8px;
-        }
-
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 20px;
-            margin-bottom: 40px;
-        }
-
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: sans-serif;
-            background-color: #ffffff;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .custom-table th {
-            background-color: #000000;
-            color: #ffffff;
-            text-align: left;
-            padding: 14px 18px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .custom-table td {
-            padding: 16px 18px;
-            font-size: 14px;
-            color: #333;
-            border-bottom: 1px solid #eaeaea;
-        }
-
-        .itinerary-table tr:nth-child(1) {
-            background-color: #f5f5f7;
-        }
-
-        .itinerary-table tr:nth-child(2) {
-            background-color: #ebebeb;
-        }
-
-        .itinerary-table tr.pink-row {
-            background-color: #f7e8e8;
-        }
-
-        .text-disney {
-            color: #d9534f;
-            font-weight: 500;
-        }
-
-        .budget-table tr {
-            background-color: #f2f2f2;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 40px; }
-            .content-row, .content-row.reverse { flex-direction: column; }
-            .gallery-grid { grid-template-columns: 1fr; }
-            .page { flex-direction: column; gap: 15px; }
-        }
-    </style>
-</head>
+<link rel="stylesheet" href="2026_10_21.css"
 <body id="top">
     <header>
         <div class="page">
-            <a class="brand" href="#top">TOKYO.</a>
+            <a class="brand" href="#top">TAIPEI EATS.</a>
             <ul class="nav">
                 <li><a href="#section1">Discover</a></li>
                 <li><a href="#section2">Neighborhoods</a></li>
                 <li><a href="#section3">Gallery</a></li>
-                <li><a href="#section4">Planner</a></li>
+                <li><a href="#section4">Food Planner</a></li>
             </ul>
         </div>
     </header>
 
     <section class="hero">
-        <h3>A Visual Journey Through Japan</h3>
-        <h1>A City of Contrasts.</h1>
-        <p>Quiet temples, electric streets, and little moments in between. Discover a different side of Tokyo.</p>
+        <h3>A Culinary Journey Through Taipei</h3>
+        <h1>Affordable Flavor.</h1>
+        <p>Rich beef noodle soup, night market street bites, and cozy alleyway eateries. Discover the tasty side of Taipei on a budget.</p>
     </section>
 
     <section id="section1" class="section">
         <div class="section-tag">01 / Discover</div>
         <div class="content-row">
             <div class="content-text">
-                <h2>Where tradition meets tomorrow.</h2>
-                <p>Tokyo is a city that never stops surprising you. One moment, you are surrounded by bright signs and busy crossings. A few streets away, you might discover a quiet shrine hidden between modern buildings.</p>
-                <p>What makes Tokyo special is the way old and new exist side by side. Every neighborhood has its own rhythm, atmosphere, and story to tell.</p>
+                <h2>Where tradition meets affordability.</h2>
+                <p>Taipei is a city that delights your palate without breaking the bank. Wander down any street, and you will find fragrant steam rising from bustling food stalls and modest family-run diners.</p>
+
+                <p>What makes dining in Taipei so special is the unmatched value. Decades-old eateries serve authentic, heart-warming dishes made with freshness and care at pocket-friendly prices.</p>
             </div>
             <div class="content-image">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAwpczILspk7_N5XtSaNCVfgDzfzF5Nd_a0-RRPVk5lS8QWJ0Un9mmz32Q3g&s" alt="Tokyo Street">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyrAmw2_q8qDgUyINvsKl1yYKWE79iKwp1Ca0vhTJOFRkuR4PTl4710KUk1iM&s" alt="Taipei Beef Noodles">
             </div>
         </div>
     </section>
@@ -313,48 +39,49 @@
         <div class="section-tag">02 / Neighborhoods</div>
         <div class="content-row reverse">
             <div class="content-text">
-                <h2>Slow down. Look closer.</h2>
-                <p>Beyond the crowded stations and famous landmarks, Tokyo is full of peaceful corners. Small cafés, traditional shops, and narrow streets invite visitors to take their time.</p>
-                <p>Spend an afternoon walking without a strict plan. Notice the details: wooden doors, warm lanterns, tiny gardens, and the everyday life happening all around you.</p>
+                <h2>Slow down. Taste local.</h2>
+                <p>Step away from the luxury shopping malls, and step into Taipei’s vibrant food alleys. Student districts and traditional markets host some of the city's best-kept culinary secrets.</p>
+
+                <p>Spend an afternoon exploring without a strict agenda. Follow the irresistible aromas of sizzling scallion pancakes, braised pork rice, and freshly steamed dumplings.</p>
             </div>
             <div class="content-image">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWhsiCbOecz_BSMJVjvtXExShcoK34xiNDbgKNtTI-p4_Eh9lgwHSOy-uq-A&s" alt="Traditional Alleys">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqvS9n_D9v-zly8CgPZg8YuvHcXCs7rYE5xGdHsGMnNQ-SRrNbVDw0oC9lzWs&s" alt="Taipei Street Food Alley">
             </div>
         </div>
     </section>
 
     <section id="section3" class="section" style="max-width: 1200px;">
         <div class="section-tag">03 / Photo Journal</div>
-        <h2>Tokyo in three frames.</h2>
-        <p style="font-size: 14px; color: #777;">Move your mouse over each photograph to reveal the story behind the image.</p>
+        <h2>Taipei in three flavors.</h2>
+        <p style="font-size: 14px; color: #777;">Move your mouse over each photograph to reveal the story behind the dish.</p>
         
         <div class="gallery-grid">
             <div class="container">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFgyn4V4S-3RDlL2sDmTfaBRwAWUXfgEHq-hSdTxqtA9J6DBIKaEsoqlgEU-U&s" alt="City Lights" class="image">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnxoEckeHKaRHqkD8ntYvfq-__KfDUGzwL-05kNIIu_ZVI8oxO6D-qRSG52iE&s" alt="Steamed Dumplings" class="image">
                 <div class="overlay">
                     <div class="text">
-                        City Lights
-                        <span>Tokyo After Dark</span>
+                        Soup Dumplings
+                        <span>Thin Skin & Hot Broth</span>
                     </div>
                 </div>
             </div>
 
             <div class="container">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSckKfUiPQwcAkPaW7E7cJ88HzCMpy5omoL3Z7lvecEs_fDRG4wLZynK1rl6cQ&s" alt="Mountain View" class="image">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqHz2BKDnTMHwdOG3dJofTQ9hptFul9w5kbf-1bxN8M0VcmsjXGLykMby48A&s" alt="Braised Pork Rice" class="image">
                 <div class="overlay">
                     <div class="text">
-                        Sunset View
-                        <span>Distant Mountains</span>
+                        Fuhang Soy Milk
+                        <span>Taiwan's Variety of breakfast</span>
                     </div>
                 </div>
             </div>
 
             <div class="container">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL9kGu-mbniiQzJytZlOre8_KsVStV8ylMjCIT-21kx4m9blSDg9tMyECsoT8&s" alt="Red Lantern" class="image">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcO5jD-FIm1Wv6_aAjUaLr0NGX5VZyixmfwcE6M96Ib_6erIfxG_DdjL6T4g&s" alt="Night Market Eats" class="image">
                 <div class="overlay">
                     <div class="text">
-                        Traditional Alleys
-                        <span>Hidden Lanterns</span>
+                        Night Market Eats
+                        <span>Endless Variety for Coins</span>
                     </div>
                 </div>
             </div>
@@ -363,8 +90,8 @@
 
     <section id="section4" class="section">
         <div class="section-tag">03 / TRAVEL PLANNER</div>
-        <h2>Three Days in Tokyo.</h2>
-        <p>Plan your mornings, afternoons, and evenings with this simple three-day itinerary.</p>
+        <h2>Three Days of Budget Eats.</h2>
+        <p>Plan your breakfasts, lunches, and night market dinners with this simple three-day foodie itinerary.</p>
 
         <div class="table-container">
             <table class="custom-table itinerary-table">
@@ -379,27 +106,27 @@
                 <tbody>
                     <tr>
                         <td><strong>Day 1</strong></td>
-                        <td>Asakusa Temple</td>
-                        <td>Ueno Park</td>
-                        <td>Shibuya</td>
+                        <td>Fu Hang Soy Milk</td>
+                        <td>Yongkang Beef Noodles</td>
+                        <td>Ningxia Night Market</td>
                     </tr>
                     <tr>
                         <td><strong>Day 2</strong></td>
-                        <td>Meiji Shrine</td>
-                        <td>Harajuku</td>
-                        <td>Shinjuku</td>
+                        <td>Ding Yuan Soy Milk</td>
+                        <td>Jin Feng Braised Pork Rice</td>
+                        <td>Shilin Night Market</td>
                     </tr>
                     <tr class="pink-row">
                         <td><strong>Day 3</strong></td>
-                        <td colspan="2" style="text-align: center;" class="text-disney">Tokyo DisneySea</td>
-                        <td>Odaiba</td>
+                        <td colspan="2" style="text-align: center;" class="text-disney">Gongguan Food District (Boba & Gua Bao)</td>
+                        <td>Tonghua Night Market</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <h2>Travel Budget</h2>
-        <p>A sample budget for transportation and meals in Tokyo.</p>
+        <h2>Food & Travel Budget</h2>
+        <p>A sample daily budget for transportation and meals in Taipei.</p>
 
         <div class="table-container">
             <table class="custom-table budget-table">
@@ -413,21 +140,21 @@
                 <tbody>
                     <tr>
                         <td rowspan="2"><strong>Transportation</strong></td>
-                        <td>Metro</td>
-                        <td class="text-right">¥1,000</td>
+                        <td>Taipei Metro Day Pass</td>
+                        <td class="text-right">NT$ 150</td>
                     </tr>
                     <tr>
-                        <td>Train</td>
-                        <td class="text-right">¥1,500</td>
+                        <td>Bus & Short Walks</td>
+                        <td class="text-right">NT$ 30</td>
                     </tr>
                     <tr>
                         <td rowspan="2"><strong>Food</strong></td>
-                        <td>Lunch</td>
-                        <td class="text-right">¥1,200</td>
+                        <td>Budget Meal (Lunch)</td>
+                        <td class="text-right">NT$ 120</td>
                     </tr>
                     <tr>
-                        <td>Dinner</td>
-                        <td class="text-right">¥2,000</td>
+                        <td>Night Market Feast (Dinner)</td>
+                        <td class="text-right">NT$ 250</td>
                     </tr>
                 </tbody>
             </table>
