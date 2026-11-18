@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARC STUDY - Canvas Geometry</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #efeee9;
+      color: #1c2826;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .poster {
+      width: 100%;
+      max-width: 680px;
+      background-color: #f4f3ef;
+      padding: 48px 52px 44px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+    }
+
+    .header-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #4f5d5a;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 46px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      color: #162321;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #4a5553;
+      margin-bottom: 24px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      background-color: transparent;
+      border: 1.5px solid #162321;
+      color: #162321;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    .btn:hover,
+    .btn.active {
+      background-color: #162321;
+      color: #f4f3ef;
+    }
+
+    .canvas-wrapper {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      margin-bottom: 28px;
+      background-color: #eae8e1;
+      border: 1px solid #dcd9d0;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .footer-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #1c2826;
+      margin-bottom: 6px;
+    }
+
+    .footer-meta {
+      font-size: 12px;
+      color: #6b7573;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <header>
+      <div class="header-kicker">FORM / COLOUR / ANGLE</div>
+      <h1>ARC STUDY</h1>
+      <p class="subtitle">One circle. Many possibilities.</p>
+    </header>
+
+    <div class="controls">
+      <button type="button" class="btn" onclick="showOnly(1, this)">01 / 180°</button>
+      <button type="button" class="btn" onclick="showOnly(2, this)">02 / 90°</button>
+      <button type="button" class="btn" onclick="showOnly(3, this)">03 / 270°</button>
+      <button type="button" class="btn" onclick="showOnly(4, this)">04 / 120°</button>
+      <button type="button" class="btn" onclick="showOnly(0, this)">SHOW ALL</button>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="arcCanvas"></canvas>
+    </div>
+
+    <footer>
+      <div class="footer-title">CIRCULAR THINKING</div>
+      <div class="footer-meta">Canvas geometry / beginPath / arc / fill / stroke</div>
+    </footer>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("arcCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const size = 800;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    ctx.scale(dpr, dpr);
+
+    const half = size / 2;
+
+    // 底部標籤
+    function drawLabel(text, x, y, color) {
+      ctx.save();
+      ctx.font = "700 13px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+      ctx.fillStyle = color;
+      ctx.textBaseline = "bottom";
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    function drawQuadrant1() {
+      const ox = 0, oy = 0;
+
+      // 背景
+      ctx.fillStyle = "#ebc2b3";
+      ctx.fillRect(ox, oy, half, half);
+
+      // 紅褐色上半圓
+      const cx = ox + half / 2;
+      const cy = oy + half * 0.56;
+      const r = half * 0.31;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, Math.PI, 0, false);
+      ctx.closePath();
+      ctx.fillStyle = "#c95b45";
+      ctx.fill();
+
+      // 下方細水平線
+      ctx.beginPath();
+      ctx.moveTo(cx - r, cy + 22);
+      ctx.lineTo(cx + r, cy + 22);
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = "#c95b45";
+      ctx.stroke();
+
+      drawLabel("01 / HALF CIRCLE / 180°", ox + 26, oy + half - 22, "#3c2a26");
+    }
+
+    function drawQuadrant2() {
+      const ox = half, oy = 0;
+
+      // 深墨綠色背景
+      ctx.fillStyle = "#0e4d45";
+      ctx.fillRect(ox, oy, half, half);
+
+      // 大米白色扇形 
+      const bigCx = ox + half * 0.22;
+      const bigCy = oy + half * 0.16;
+      const bigR = half * 0.54;
+
+      ctx.beginPath();
+      ctx.moveTo(bigCx, bigCy);
+      ctx.arc(bigCx, bigCy, bigR, 0, Math.PI / 2, false);
+      ctx.closePath();
+      ctx.fillStyle = "#efe1ce";
+      ctx.fill();
+
+      // 右下淺粉色扇形 
+      const smallCx = ox + half * 0.76;
+      const smallCy = oy + half * 0.70;
+      const smallR = half * 0.24;
+
+      ctx.beginPath();
+      ctx.moveTo(smallCx, smallCy);
+      ctx.arc(smallCx, smallCy, smallR, Math.PI, Math.PI * 1.5, false);
+      ctx.closePath();
+      ctx.fillStyle = "#e8a598";
+      ctx.fill();
+
+      drawLabel("02 / QUARTER SECTORS / 90°", ox + 26, oy + half - 22, "#f0ece4");
+    }
+
+    function drawQuadrant3() {
+      const ox = 0, oy = half;
+
+      // 粉紅色背景
+      ctx.fillStyle = "#e69d94";
+      ctx.fillRect(ox, oy, half, half);
+
+      const cx = ox + half * 0.48;
+      const cy = oy + half * 0.48;
+
+      // 米白色四分之三圓
+      const mainR = half * 0.32;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, mainR, 0, Math.PI * 1.5, false);
+      ctx.closePath();
+      ctx.fillStyle = "#ece9e2";
+      ctx.fill();
+
+      // 右上缺口處的深紅褐色 0°扇形
+      const insetOffset = 10;
+      const subCx = cx + insetOffset;
+      const subCy = cy - insetOffset;
+      const subR = half * 0.24;
+
+      ctx.beginPath();
+      ctx.moveTo(subCx, subCy);
+      ctx.arc(subCx, subCy, subR, Math.PI * 1.5, 0, false);
+      ctx.closePath();
+      ctx.fillStyle = "#a33c2f";
+      ctx.fill();
+
+      drawLabel("03 / THREE QUARTERS / 270°", ox + 26, oy + half - 22, "#3c2a26");
+    }
+
+    function drawQuadrant4() {
+      const ox = half, oy = half;
+
+      // 米色背景
+      ctx.fillStyle = "#e6dfd3";
+      ctx.fillRect(ox, oy, half, half);
+
+      const cx = ox + half * 0.5;
+      const cy = oy + half * 0.62;
+
+      // 120° 弧
+      const startAngle = -Math.PI / 2 - Math.PI / 3; // -150°
+      const endAngle = -Math.PI / 2 + Math.PI / 3;   // -30°
+
+      ctx.lineCap = "butt";
+
+      // 外層深綠色弧線
+      ctx.beginPath();
+      ctx.arc(cx, cy, half * 0.28, startAngle, endAngle, false);
+      ctx.lineWidth = 18;
+      ctx.strokeStyle = "#104c44";
+      ctx.stroke();
+
+      // 內層紅褐色弧線
+      ctx.beginPath();
+      ctx.arc(cx, cy, half * 0.19, startAngle, endAngle, false);
+      ctx.lineWidth = 11;
+      ctx.strokeStyle = "#c95b45";
+      ctx.stroke();
+
+      drawLabel("04 / OPEN ARCS / 120°", ox + 26, oy + half - 22, "#2f3533");
+    }
+
+    // 按鈕
+    function showOnly(num, btn) {
+      document.querySelectorAll(".btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      ctx.clearRect(0, 0, size, size);
+
+      if (num === 1) drawQuadrant1();
+      if (num === 2) drawQuadrant2();
+      if (num === 3) drawQuadrant3();
+      if (num === 4) drawQuadrant4();
+      if (num === 0) {
+        drawQuadrant1();
+        drawQuadrant2();
+        drawQuadrant3();
+        drawQuadrant4();
+      }
+    }
+  </script>
+</body>
+</html>

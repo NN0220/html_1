@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blue Hour - Canvas Analog Clock</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 22% 28%, #1e3547 0%, #0e1b26 65%, #081018 100%);
+      color: #f4f1ea;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 24px;
+    }
+
+    .container {
+      max-width: 960px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    @media (max-width: 780px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 36px;
+        text-align: center;
+      }
+      .controls {
+        justify-content: center;
+      }
+      .exercise-list {
+        text-align: left;
+      }
+    }
+
+    .canvas-box {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 56px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: #f7f4ed;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #a9b8c4;
+      margin-bottom: 24px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.05);
+      color: #e6ecf0;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn.active {
+      background: #f2c496;
+      color: #16232e;
+      border-color: #f2c496;
+    }
+
+    .exercise-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 20px;
+      margin-bottom: 14px;
+      color: #f4f1ea;
+    }
+
+    .exercise-list {
+      padding-left: 18px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #b7c5d1;
+    }
+
+    .exercise-list li {
+      margin-bottom: 10px;
+    }
+
+    .exercise-list strong {
+      color: #f4f1ea;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12.5px;
+      color: #f2c496;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="canvas-box">
+      <canvas id="clockCanvas"></canvas>
+    </div>
+
+    <section class="info">
+      <h1>Blue Hour</h1>
+      <p class="subtitle">Draw an analog clock in HTML Canvas.</p>
+
+      <div class="controls">
+        <button type="button" class="btn active" id="btnSample">Sample · 10:08:37</button>
+        <button type="button" class="btn" id="btnLive">Live time</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("clockCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // 支援 Retina 高解析度螢幕
+    const size = 600;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    ctx.scale(dpr, dpr);
+
+    const cx = size / 2;
+    const cy = size / 2;
+    const radius = size * 0.44;
+
+    let mode = "sample"; // "sample" (10:08:37) 或 "live" (現在時間)
+    let timer = null;
+
+    // 1. 繪製錶盤與四個整點羅馬數字 (XII, III, VI, IX)
+    function drawFace() {
+      ctx.save();
+
+      // 外圈陰影
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+      ctx.shadowBlur = 28;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = "#122638";
+      ctx.fill();
+      ctx.shadowColor = "transparent";
+
+      // 玫瑰金金屬外框
+      const bezelGrad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+      bezelGrad.addColorStop(0, "#f5d3ae");
+      bezelGrad.addColorStop(0.5, "#c58f63");
+      bezelGrad.addColorStop(1, "#f2cca3");
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = bezelGrad;
+      ctx.fill();
+
+      // 內凹深色槽環
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 0.945, 0, Math.PI * 2);
+      ctx.fillStyle = "#0e1d2b";
+      ctx.fill();
+
+      // 內圈細金邊
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 0.93, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(242, 196, 150, 0.55)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // 錶盤放射狀漸層 (Radial Gradient)
+      const dialRadius = radius * 0.915;
+      const dialGrad = ctx.createRadialGradient(
+        cx - dialRadius * 0.25,
+        cy - dialRadius * 0.25,
+        dialRadius * 0.05,
+        cx,
+        cy,
+        dialRadius
+      );
+      dialGrad.addColorStop(0, "#2d5a7a");
+      dialGrad.addColorStop(0.65, "#19374f");
+      dialGrad.addColorStop(1, "#0f2233");
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, dialRadius, 0, Math.PI * 2);
+      ctx.fillStyle = dialGrad;
+      ctx.fill();
+
+      // 四個整點羅馬數字
+      const quarterNumerals = [
+        { text: "XII", angle: -Math.PI / 2 },
+        { text: "III", angle: 0 },
+        { text: "VI",  angle: Math.PI / 2 },
+        { text: "IX",  angle: Math.PI }
+      ];
+
+      ctx.fillStyle = "#f4efe6";
+      ctx.font = "600 26px Georgia, 'Times New Roman', serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const numRadius = radius * 0.67;
+      quarterNumerals.forEach((item) => {
+        const x = cx + Math.cos(item.angle) * numRadius;
+        const y = cy + Math.sin(item.angle) * numRadius;
+        ctx.fillText(item.text, x, y);
+      });
+
+      ctx.restore();
+    }
+
+    // 2. 繪製 60 個刻度（12 個整點加長加粗，其餘 48 格短且細）
+    function drawTicks() {
+      const outerTick = radius * 0.87;
+
+      for (let i = 0; i < 60; i++) {
+        const angle = (i * Math.PI) / 30 - Math.PI / 2;
+        const isFifthMark = i % 5 === 0;
+        const innerTick = isFifthMark ? radius * 0.785 : radius * 0.835;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * innerTick, cy + Math.sin(angle) * innerTick);
+        ctx.lineTo(cx + Math.cos(angle) * outerTick, cy + Math.sin(angle) * outerTick);
+        ctx.strokeStyle = isFifthMark ? "#f4efe6" : "rgba(220, 230, 238, 0.55)";
+        ctx.lineWidth = isFifthMark ? 2.8 : 1.2;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // 3. 繪製多面切割多邊形指針（時針與分針）
+    function drawFacetedHand(angle, length, tailLength, halfWidth, leftColor, rightColor) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+
+      const shoulderY = -length * 0.7;
+
+      // 左切面
+      ctx.beginPath();
+      ctx.moveTo(0, tailLength);
+      ctx.lineTo(-halfWidth, shoulderY);
+      ctx.lineTo(0, -length);
+      ctx.closePath();
+      ctx.fillStyle = leftColor;
+      ctx.fill();
+
+      // 右切面
+      ctx.beginPath();
+      ctx.moveTo(0, tailLength);
+      ctx.lineTo(halfWidth, shoulderY);
+      ctx.lineTo(0, -length);
+      ctx.closePath();
+      ctx.fillStyle = rightColor;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // 繪製細長秒針與尾端圓形配重
+    function drawSecondHand(angle) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetY = 3;
+
+      ctx.beginPath();
+      ctx.moveTo(0, radius * 0.22);
+      ctx.lineTo(0, -radius * 0.82);
+      ctx.strokeStyle = "#f2c496";
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // 圓形尾端配重
+      ctx.beginPath();
+      ctx.arc(0, radius * 0.21, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#162d40";
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "#f2c496";
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // 中心固定軸蓋
+    function drawCenterCap() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#f2c496";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#102232";
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 4. 取得目前時間（10:08:37 或 系統當地時間）
+    function getCurrentTime() {
+      if (mode === "sample") {
+        return { hours: 10, minutes: 8, seconds: 37 };
+      }
+      const now = new Date();
+      return {
+        hours: now.getHours(),
+        minutes: now.getMinutes(),
+        seconds: now.getSeconds()
+      };
+    }
+
+    // 在錶盤上顯示 HH:MM:SS
+    function drawDigitalTime(hours, minutes, seconds) {
+      const pad = (n) => String(n).padStart(2, "0");
+      const timeText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+      const boxW = 114;
+      const boxH = 30;
+      const boxY = cy + radius * 0.36;
+
+      ctx.save();
+      ctx.fillStyle = "rgba(8, 17, 26, 0.68)";
+      ctx.strokeStyle = "rgba(242, 196, 150, 0.45)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(cx - boxW / 2, boxY - boxH / 2, boxW, boxH, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#f4efe6";
+      ctx.font = "600 15px 'Courier New', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(timeText, cx, boxY + 1);
+      ctx.restore();
+    }
+
+    // 計算指針角度並重繪整個時鐘
+    function updateClock() {
+      const { hours, minutes, seconds } = getCurrentTime();
+
+      const secAngle = (seconds * Math.PI) / 30;
+      const minAngle = (minutes * Math.PI) / 30 + (seconds * Math.PI) / 1800;
+      const hourAngle = ((hours % 12) * Math.PI) / 6 + (minutes * Math.PI) / 360 + (seconds * Math.PI) / 21600;
+
+      ctx.clearRect(0, 0, size, size);
+
+      drawFace();
+      drawTicks();
+      drawDigitalTime(hours, minutes, seconds);
+
+      // 寬版多邊形時針
+      drawFacetedHand(hourAngle, radius * 0.52, radius * 0.11, 10.5, "#f5cfa6", "#c68b59");
+      // 較窄、較長多邊形分針
+      drawFacetedHand(minAngle, radius * 0.74, radius * 0.14, 6.5, "#ffffff", "#bcc7d1");
+      // 細長秒針 + 圓形配重
+      drawSecondHand(secAngle);
+
+      drawCenterCap();
+    }
+
+    // 啟動或切換模式（Sample · 10:08:37 / Live time）
+    const btnSample = document.getElementById("btnSample");
+    const btnLive = document.getElementById("btnLive");
+
+    function setClockMode(newMode) {
+      mode = newMode;
+      btnSample.classList.toggle("active", mode === "sample");
+      btnLive.classList.toggle("active", mode === "live");
+
+      clearInterval(timer);
+      updateClock();
+
+      if (mode === "live") {
+        timer = setInterval(updateClock, 1000);
+      }
+    }
+
+    btnSample.addEventListener("click", () => setClockMode("sample"));
+    btnLive.addEventListener("click", () => setClockMode("live"));
+
+    // 初始啟動（預設顯示 10:08:37，點擊 Live time 即可每秒更新當地時間）
+    setClockMode("sample");
+  </script>
+</body>
+</html>
