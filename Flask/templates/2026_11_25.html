@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.name }} 的個人簡介</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: white;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+        }
+        h1 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .title {
+            color: #7f8c8d;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .skills {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .skills li {
+            background-color: white;
+            color: #29b960;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+        }
+        .contact {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="card">
+        <a href="MG_3451.jpg"></a>
+        <h1>{{ user.name }}</h1>
+        <div class="title">{{ user.title }}</div>
+        <p>{{ user.bio }}</p>
+        
+        <h3>專業技能：</h3>
+        <ul class="skills">
+            {% for skill in user.skills %}
+                <li>{{ skill }}</li>
+            {% endfor %}
+        </ul>
+
+        <div class="contact">
+            信箱：<a href="mailto:{{ user.email }}">{{ user.email }}</a>
+        </div>
+    </div>
+</body>
+</html>
